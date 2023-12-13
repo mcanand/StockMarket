@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_tickers_tree" model="ir.ui.view">
+        <field name="name">Ticker Tree View</field>
+        <field name="model">stock.ticker</field>
+        <field name="arch" type="xml">
+            <tree string="Tickers">
+                <field name="ticker_symbol"/>
+                <field name="name"/>
+                <field name="current_price"/>
+                <field name="avg_volume"/>
+                <field name="avg_volume_10_day"/>
+                <field name="total_cash"/>
+                <field name="company_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_ticker_form" model="ir.ui.view">
+        <field name="name">Ticker Form View</field>
+        <field name="model">stock.ticker</field>
+        <field name="arch" type="xml">
+            <form string="Ticker">
+                <sheet>
+                    <h1><field name="ticker_symbol" placeholder="Ticker Symbol"/></h1>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="sector"/>
+                            <field name="industry"/>
+                            <field name="summary"/>
+                            <field name="employee_count" invisible="1"/>
+                            <field name="address1"/>
+                            <field name="address2"/>
+                            <field name="city"/>
+                            <field name="country_id"/>
+                            <field name="zip"/>
+
+                        </group>
+                        <group>
+                            <field name="quote_type"/>
+                            <field name="total_cash"/>
+                            <field name="phone"/>
+                            <field name="company_id"/>
+                            <field name="website"/>
+                            <field name="currency_id"/>
+                            <field name="price_hint"/>
+                            <field name="exchange"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <group>
+                                    <field name="open"/>
+                                    <field name="day_low"/>
+                                    <field name="volume"/>
+                                    <field name="avg_volume"/>
+                                </group>
+                                <group>
+                                    <field name="current_price" string="close"/>
+                                    <field name="day_high"/>
+                                    <field name="prev_close"/>
+                                    <field name="avg_volume_10_day"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Other Info">
+                            <group>
+                                <group>
+                                    <field name="fifty_two_week_low"/>
+                                    <field name="fifty_day_avg"/>
+                                    <field name="total_cash"/>
+                                    <field name="total_debt"/>
+                                    <field name="earnings_quarterly_growth"/>
+                                    <field name="book_value"/>
+                                    <field name="market_cap"/>
+                                    <field name="payout_ratio"/>
+                                    <field name="dividend_yield"/>
+                                    <field name="implied_share_outstanding"/>
+                                    <field name="float_share"/>
+                                </group>
+                                <group>
+                                     <field name="fifty_two_week_high"/>
+                                     <field name="price_to_sales_twelve_months"/>
+                                     <field name="total_cash_per_share"/>
+                                     <field name="total_revenue"/>
+                                     <field name="price_book"/>
+                                     <field name="two_hundred_day_avg"/>
+                                     <field name="trailing_pe"/>
+                                     <field name="dividend_rate"/>
+                                     <field name="x_dividend_date"/>
+                                     <field name="share_outstanding"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_view_ticker" model="ir.actions.act_window">
+        <field name="name">ticker</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.ticker</field>
+        <field name="view_id" ref="view_tickers_tree"/>
+    </record>
+
+    <menuitem id="menu_view_stock" name="Stock">
+        <menuitem id="menu_view_ticker" name="Tickers" action="action_view_ticker"/>
+    </menuitem>
+</odoo>
