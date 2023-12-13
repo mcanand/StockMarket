@@ -139,7 +139,7 @@ class StockTickers(models.Model):
             vals_list['day_high'] = info.get('dayHigh')
             vals_list['dividend_rate'] = info.get('dividendRate')
             vals_list['dividend_yield'] = info.get('dividendYield')
-            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate'))
+            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate')) if info.get('exDividendDate') else False
             vals_list['payout_ratio'] = info.get('payoutRatio')
             vals_list['trailing_pe'] = info.get('trailingPE')
             vals_list['volume'] = info.get('volume')
