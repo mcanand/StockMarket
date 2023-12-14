@@ -31,14 +31,16 @@
                             <field name="day_low"/>
                             <field name="volume"/>
                             <field name="avg_volume"/>
+                             <field name="quote_type"/>
+                            <field name="total_cash"/>
                         </group>
                         <group>
                             <field name="current_price" string="close"/>
                             <field name="day_high"/>
                             <field name="prev_close"/>
                             <field name="avg_volume_10_day"/>
-                            <field name="quote_type"/>
-                            <field name="total_cash"/>
+                            <field name="bo_volume" string="Breakout Volume"/>
+                            <field name="bo_perc" string="Breakout Perc(%)"/>
                         </group>
                     </group>
                     <notebook>

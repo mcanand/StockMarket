@@ -28,8 +28,8 @@ class StockTickers(models.Model):
     implied_share_outstanding = fields.Char()
 
     mail_extra_content = fields.Char()
-    volume_calc = fields.Float()
-    perc_calc = fields.Float()
+    bo_volume = fields.Float()
+    bo_perc = fields.Float()
 
 
     company_id = fields.Many2one('res.company')
@@ -177,8 +177,8 @@ class StockTickers(models.Model):
     def check_break_out(self):
         """current volume grater than avg 10 day volume x 3 then considered as breakout"""
         # TODO add 3 in company to get percentage conditional wise
-        check_price = ((self.open * self.perc_calc) / 100)
-        if self.volume >= (self.avg_volume_10_day * self.volume_calc) and self.current_price >= (self.open + check_price):
+        check_price = ((self.open * self.bo_perc) / 100)
+        if self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.current_price >= (self.open + check_price):
             self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * 3) and self.current_price >= (self.open + check_price)"
             self.trigger_breakout_mail()
 
