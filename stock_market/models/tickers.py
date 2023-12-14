@@ -26,6 +26,7 @@ class StockTickers(models.Model):
     float_share = fields.Char()
     share_outstanding = fields.Char()
     implied_share_outstanding = fields.Char()
+    mail_extra_content = fields.Char()
 
     company_id = fields.Many2one('res.company')
     prev_close = fields.Float()
@@ -90,7 +91,8 @@ class StockTickers(models.Model):
             vals_list['day_high'] = info.get('dayHigh')
             vals_list['dividend_rate'] = info.get('dividendRate')
             vals_list['dividend_yield'] = info.get('dividendYield')
-            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate'))
+            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate')) if info.get(
+                'exDividendDate') else False
             vals_list['payout_ratio'] = info.get('payoutRatio')
             vals_list['trailing_pe'] = info.get('trailingPE')
             vals_list['volume'] = info.get('volume')
@@ -139,7 +141,8 @@ class StockTickers(models.Model):
             vals_list['day_high'] = info.get('dayHigh')
             vals_list['dividend_rate'] = info.get('dividendRate')
             vals_list['dividend_yield'] = info.get('dividendYield')
-            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate')) if info.get('exDividendDate') else False
+            vals_list['x_dividend_date'] = datetime.fromtimestamp(info.get('exDividendDate')) if info.get(
+                'exDividendDate') else False
             vals_list['payout_ratio'] = info.get('payoutRatio')
             vals_list['trailing_pe'] = info.get('trailingPE')
             vals_list['volume'] = info.get('volume')
@@ -167,8 +170,32 @@ class StockTickers(models.Model):
             vals_list['implied_share_outstanding'] = info.get('impliedSharesOutstanding')
             return vals_list
 
+    def check_break_out(self):
+        """current volume grater than avg 10 day volume x 3 then considered as breakout"""
+        # TODO add 3 in company to get percentage conditional wise
+        if self.volume >= (self.avg_volume_10_day * 3):
+            self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * 3)"
+            self.trigger_breakout_mail()
+        check_price = ((self.open * 3) / 100)
+        if self.current_price >= (self.open + check_price):
+            self.mail_extra_content = "self.current_price >= (self.open + check_price) || check price = ((self.open * 3) / 100)"
+            self.trigger_breakout_mail()
+
+    def trigger_breakout_mail(self):
+        """Send mail to all existing partners"""
+        # Todo can be added which are the partners who is subscribed for this update
+        mail_template = self.env.ref('stock_market.email_stock_breakout_info')
+        if self.company_id.email:
+            mail_template.email_from = self.company_id.email
+            partners = [x for x in self.env['res.partner'].search([]) if x.email]
+            for partner in partners:
+                if partner.email:
+                    mail_template.email_to = partner.email
+                    mail_template.send_mail(self.id, force_send=True)
+
     def update_stock(self):
+        """Crone Function to fetch data"""
         for rec in self.env['stock.ticker'].search([]):
             vals_list = rec.get_stock_vals()
             rec.write(vals_list)
-            print('update stock info')
+            rec.check_break_out()

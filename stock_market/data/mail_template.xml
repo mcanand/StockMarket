@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data noupdate="1">
+        <record id="email_stock_breakout_info" model="mail.template">
+            <field name="name">Stock Market Break Out Informer</field>
+            <field name="model_id" ref="stock_market.model_stock_ticker"/>
+            <field name="email_from">{{ user.email }}</field>
+            <field name="subject">{{ object.name }} Breakout Informer</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    Hello,
+                    <br/>
+                    <br/>
+                    <h1><strong t-out="object.ticker_symbol or ''"/></h1>
+                    There is a <t t-out="object.quote_type"/> breakout update in
+                    <h3><strong t-out="object.name or ''"/></h3>
+                    <h2>Trigger Price : <strong style="color:green;" t-out="object.current_price"/></h2>
+                    <h3>Trigger Volume : <strong style="color:blue;" t-out="object.volume"/></h3>
+                    <br/>
+                    date : <strong style="color:blue;" t-out="object.write_date"/>
+                    <br/>
+                    <p t-out="object.mail_extra_content"/>
+                    <br/>
+                    Please check and buy if Needed...
+                    <br/>
+                    <t t-out="object.company_id.name"/>
+                    <br/>
+                    Thank You.....
+                </div>
+            </field>
+            <field name="auto_delete" eval="False"/>
+        </record>
+    </data>
+</odoo>
