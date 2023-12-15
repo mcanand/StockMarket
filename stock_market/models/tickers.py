@@ -31,7 +31,8 @@ class StockTickers(models.Model):
     bo_volume = fields.Float()
     bo_perc = fields.Float()
     bo_ready = fields.Boolean()
-
+    mail_send = fields.Boolean
+    price_perc_update = fields.Float(compute="_compute_price_perc")
 
     company_id = fields.Many2one('res.company')
     prev_close = fields.Float()
@@ -62,6 +63,12 @@ class StockTickers(models.Model):
     total_cash_per_share = fields.Float()
     total_debt = fields.Float()
     total_revenue = fields.Float()
+
+    @api.depends('current_price', 'open')
+    def _compute_price_perc(self):
+        for rec in self:
+            perc = ((rec.current_price - rec.prev_close) / rec.prev_close) * 100
+            rec.price_perc_update = perc
 
     def get_currency(self, currency):
         currency = self.env['res.currency'].search([('name', '=', currency)])
@@ -177,25 +184,27 @@ class StockTickers(models.Model):
 
     def check_break_out(self):
         """current volume grater than avg 10 day volume x 3 then considered as breakout"""
-        # TODO add 3 in company to get percentage conditional wise
         check_price = ((self.open * self.bo_perc) / 100)
         self.bo_ready = False
         if self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.current_price >= (self.open + check_price):
             self.bo_ready = True
-            self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * 3) and self.current_price >= (self.open + check_price)"
+            self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.current_price >= (self.open + check_price)"
             self.trigger_breakout_mail()
+        else:
+            self.mail_send = False
 
     def trigger_breakout_mail(self):
         """Send mail to all existing partners"""
         # Todo can be added which are the partners who is subscribed for this update
         mail_template = self.env.ref('stock_market.email_stock_breakout_info')
-        if self.company_id.email:
+        if self.company_id.email and not self.mail_send:
             mail_template.email_from = self.company_id.email
             partners = [x for x in self.env['res.partner'].search([]) if x.email]
             for partner in partners:
                 if partner.email:
                     mail_template.email_to = partner.email
                     mail_template.send_mail(self.id, force_send=True)
+            self.mail_send = True
 
     def update_stock(self):
         """Crone Function to fetch data"""

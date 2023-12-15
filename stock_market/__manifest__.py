@@ -1,7 +1,7 @@
 
 {
     'name': 'Stock Market',
-    'version': '15.0.0.1.0.1',
+    'version': '17.0.0.1',
     'sequence': 1,
     'summary': '',
     'depends': ['mail'],

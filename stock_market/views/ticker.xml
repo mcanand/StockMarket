@@ -42,6 +42,7 @@
                             <field name="bo_volume" string="Breakout Volume"/>
                             <field name="bo_perc" string="Breakout Perc(%)"/>
                             <field name="bo_ready" string="Breakout Ready"/>
+                            <field name="price_perc_update" string="up Percentage"/>
                         </group>
                     </group>
                     <notebook>
@@ -110,29 +111,19 @@
                 <field name="prev_close"/>
                 <field name="current_price"/>
                 <field name="bo_ready"/>
+                <field name="price_perc_update"/>
                 <templates>
-
                     <t t-name="kanban-box">
                         <div class="oe_kanban_global_click p-3 rounded-lg bg-success blinking"
-
                              t-if="record.bo_ready.raw_value == true">
-
-                            <div class="row ">
+                            <div class="row text-white">
                                 <deiv class="col-9">
-                                    <h1>
-                                        <t t-if="record.current_price.value > record.prev_close.value">
-                                            <strong class="">
+                                    <h1 class="text-white">
+
                                                 <field name="ticker_symbol"/>
-                                            </strong>
-                                        </t>
-                                        <t t-if="record.prev_close.value > record.current_price.value">
-                                            <strong class="">
-                                                <field name="ticker_symbol"/>
-                                            </strong>
-                                        </t>
                                     </h1>
                                 </deiv>
-                                <deiv class="col-2 text-right p-0">
+                                <deiv class="col-2 text-end p-0">
                                     <t t-if="record.current_price.value > record.prev_close.value">
                                         <span>
                                             <i class="fa fa-arrow-up "/>
@@ -142,40 +133,37 @@
                                         <span>
                                             <i class="fa fa-arrow-down "/>
                                         </span>
-
                                     </t>
                                 </deiv>
                                 <div class="col-8">
                                     <field name="name"/>
                                 </div>
-                                <div class="col-4 text-right">
+                                <div class="col-4 text-end text-white">
                                     <field name="exchange"/>
                                     <t t-if="record.current_price.value > record.prev_close.value">
-
-                                        <h4 class="">
-                                            <field name="current_price"/>
+                                        <h4 class="text-white">
+                                            <field name="current_price"/><br/>
+                                            (<field name="price_perc_update"/>%)
                                         </h4>
-
                                     </t>
                                     <t t-if="record.prev_close.value > record.current_price.value">
-
-                                        <h4 class="">
-                                            <field name="current_price"/>
+                                        <h4 class="text-white">
+                                            <field name="current_price"/><br/>
+                                            (<field name="price_perc_update"/>%)
                                         </h4>
-
                                     </t>
                                 </div>
                                 <div class="col-6 mt-2">
                                     <field name="industry"/>
                                 </div>
-                                <div class="col-6 text-right">
+                                <div class="col-6 text-end">
                                     <field name="quote_type"/>
                                 </div>
                                 <div class="col-12">
                                     <style>
                                         .blinking {
 
-                                        animation: opacity 0.700s ease-in-out 5;
+                                        animation: opacity 0.400s ease-in-out 2;
                                         opacity: 1;
                                         }
 
@@ -194,13 +182,16 @@
                                         }
                                     </style>
                                     <t t-if="record.bo_ready.raw_value == true">
-                                        <marquee class="text-white " behavior="alternate">
-                                            Breakout..Breakout..Breakout..
+                                        <marquee class="text-white" >
+                                            ....................Breakout....................
                                         </marquee>
                                     </t>
                                 </div>
                             </div>
                         </div>
+
+
+
                         <div class="oe_kanban_global_click p-3 rounded-lg " t-if="record.bo_ready.raw_value == false">
                             <div class="row ">
                                 <deiv class="col-9">
@@ -217,7 +208,7 @@
                                         </t>
                                     </h1>
                                 </deiv>
-                                <deiv class="col-2 text-right p-0">
+                                <deiv class="col-2 text-end p-0">
                                     <t t-if="record.current_price.value > record.prev_close.value">
                                         <span>
                                             <i class="fa fa-arrow-up text-success"/>
@@ -233,19 +224,21 @@
                                 <div class="col-8">
                                     <field name="name"/>
                                 </div>
-                                <div class="col-4 text-right">
+                                <div class="col-4 text-end">
                                     <field name="exchange"/>
                                     <t t-if="record.current_price.value > record.prev_close.value">
 
                                         <h4 class="text-success">
-                                            <field name="current_price"/>
+                                            <field name="current_price"/><br/>
+                                            (<field name="price_perc_update"/>%)
                                         </h4>
 
                                     </t>
                                     <t t-if="record.prev_close.value > record.current_price.value">
 
                                         <h4 class="text-danger">
-                                            <field name="current_price"/>
+                                            <field name="current_price"/><br/>
+                                            (<field name="price_perc_update"/>%)
                                         </h4>
 
                                     </t>
@@ -253,14 +246,8 @@
                                 <div class="col-6 mt-2">
                                     <field name="industry"/>
                                 </div>
-                                <div class="col-6 text-right">
+                                <div class="col-6 text-end">
                                     <field name="quote_type"/>
-                                </div>
-                                <div class="col-12">
-                                    <t t-if="record.bo_ready.raw_value == true">
-                                        <!--                                        <t t-esc="record.bo_ready.raw_value == true"/>-->
-                                        <marquee behavior="alternate">Breakout..Breakout..Breakout..</marquee>
-                                    </t>
                                 </div>
                             </div>
                         </div>
