@@ -25,8 +25,9 @@ class StockTickerData(models.Model):
         for i, (key, value) in enumerate(data.items()):
             timestamp_str = key.strftime('%Y-%m-%d %H:%M:%S')  # Replace this with your timestamp string
             format_str = '%Y-%m-%d %H:%M:%S'
+            datetime_obj = datetime.strptime(timestamp_str, format_str)
             if self.env.user.tz == 'Asia/Calcutta':
-                datetime_obj = datetime.strptime(timestamp_str, format_str) - timedelta(hours=5, minutes=30)
+                datetime_obj = datetime_obj - timedelta(hours=5, minutes=30)
             if not datetime_obj in day_entries:
                 vals = {}
                 vals['date_time'] = datetime_obj
