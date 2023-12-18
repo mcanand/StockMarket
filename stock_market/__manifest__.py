@@ -10,6 +10,8 @@
         'data/data.xml',
         'data/mail_template.xml',
         'views/ticker.xml',
+        'views/ticker_data.xml',
+        'views/ticker_day_data.xml',
     ],
     'installable': True,
     'application': True,

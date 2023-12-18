@@ -1,12 +1,14 @@
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import yfinance as yf
 
 
 class StockTickers(models.Model):
     _name = 'stock.ticker'
+
+    stock_ticker_data_ids = fields.One2many('stock.ticker.data', 'ticker_id', 'Stock Data')
 
     name = fields.Char()
     ticker_symbol = fields.Char()
@@ -31,7 +33,7 @@ class StockTickers(models.Model):
     bo_volume = fields.Float()
     bo_perc = fields.Float()
     bo_ready = fields.Boolean()
-    mail_send = fields.Boolean
+    mail_send = fields.Boolean()
     price_perc_update = fields.Float(compute="_compute_price_perc")
 
     company_id = fields.Many2one('res.company')
@@ -67,8 +69,10 @@ class StockTickers(models.Model):
     @api.depends('current_price', 'open')
     def _compute_price_perc(self):
         for rec in self:
-            perc = ((rec.current_price - rec.prev_close) / rec.prev_close) * 100
-            rec.price_perc_update = perc
+            rec.price_perc_update = 0
+            if rec.current_price != 0 and rec.prev_close != 0:
+                perc = ((rec.current_price - rec.prev_close) / rec.prev_close) * 100
+                rec.price_perc_update = perc
 
     def get_currency(self, currency):
         currency = self.env['res.currency'].search([('name', '=', currency)])
@@ -80,11 +84,39 @@ class StockTickers(models.Model):
         country = self.env['res.country'].search([('currency_id', '=', currency.id)], limit=1)
         return country.id or False
 
+    def convert_data_frame_to_list(self, pd_dataframe):
+        dict_list = []
+        for _, row in pd_dataframe.iterrows():
+            dictionary = {}
+            for column in pd_dataframe.columns:
+                dictionary[column] = row[column]
+            dict_list.append(dictionary)
+        return dict_list
+
+    def prepare_ticker_data_vals(self, data):
+        ticker_data_list = []
+        for i, (key, value) in enumerate(data.items()):
+            timestamp_str = key.strftime('%Y-%m-%d %H:%M:%S')  # Replace this with your timestamp string
+            format_str = '%Y-%m-%d %H:%M:%S'
+            datetime_obj = datetime.strptime(timestamp_str, format_str)
+            vals = {}
+            vals['date'] = datetime_obj.date()
+            vals['open'] = value.get('Open')
+            vals['close'] = value.get('Close')
+            vals['low'] = value.get('Low')
+            vals['high'] = value.get('High')
+            vals['volume'] = value.get('Volume')
+            ticker_data_list.append((0, 0, vals))
+        return ticker_data_list
+
     def get_stock_ticker_info(self, symbol):
         stock = yf.Ticker(symbol)
         info = stock.info
+        all_data = stock.history(period='max').to_dict(orient="index")
+        data = self.prepare_ticker_data_vals(all_data)
         vals_list = {}
         vals_list['ticker_symbol'] = symbol
+        vals_list['stock_ticker_data_ids'] = data
         if info:
             vals_list['name'] = info.get('longName')
             vals_list['address1'] = info.get('address1')
@@ -184,11 +216,10 @@ class StockTickers(models.Model):
 
     def check_break_out(self):
         """current volume grater than avg 10 day volume x 3 then considered as breakout"""
-        check_price = ((self.open * self.bo_perc) / 100)
         self.bo_ready = False
-        if self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.current_price >= (self.open + check_price):
+        if self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.price_perc_update >= self.bo_perc:
             self.bo_ready = True
-            self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * self.bo_volume) and self.current_price >= (self.open + check_price)"
+            self.mail_extra_content = "self.volume >= (self.avg_volume_10_day * self.bo_volume) and  self.price_perc_update >= self.bo_perc"
             self.trigger_breakout_mail()
         else:
             self.mail_send = False

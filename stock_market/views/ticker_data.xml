@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_ticker_data_form" model="ir.ui.view">
+        <field name="name">Ticker Data Form View</field>
+        <field name="model">stock.ticker.data</field>
+        <field name="arch" type="xml">
+            <form string="Ticker Data">
+                <header>
+                    <button type="object" name="action_get_day_data" string="grt"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="open"/>
+                            <field name="high"/>
+                        </group>
+                        <grouo>
+                            <field name="volume"/>
+                            <field name="close"/>
+                            <field name="low"/>
+                        </grouo>
+                    </group>
+                    <field name="stock_ticker_day_data_ids">
+                        <tree>
+                            <field name="date_time"/>
+                            <field name="open"/>
+                            <field name="close"/>
+                            <field name="high"/>
+                            <field name="low"/>
+                            <field name="volume"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_ticker_data_tree" model="ir.ui.view">
+        <field name="name">Ticker Data tree View</field>
+        <field name="model">stock.ticker.data</field>
+        <field name="arch" type="xml">
+            <form string="Ticker Data">
+                <tree>
+                    <field name="date"/>
+                    <field name="open"/>
+                    <field name="close"/>
+                    <field name="high"/>
+                    <field name="low"/>
+                    <field name="volume"/>
+                </tree>
+            </form>
+        </field>
+    </record>
+</odoo>

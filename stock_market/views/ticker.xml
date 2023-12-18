@@ -98,6 +98,19 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="All Time Data">
+                            <field name="stock_ticker_data_ids">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="open"/>
+                                    <field name="close"/>
+                                    <field name="high"/>
+                                    <field name="low"/>
+                                    <field name="volume"/>
+                                    <button type="object" name="action_get_day_data" string="Get Day Data"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>
